@@ -4,15 +4,41 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var nconf = require('nconf');
+var winston =require('winston');
+var nunjucks = require('nunjucks');
+
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
 
+nconf.env("__");
+
+nconf.file("config.json");
+
+nconf.defaults ({
+    "http":{
+        "port":3000
+    }
+});
+//my nunjucks
+nunjucks.configure('views', {
+    autoescape:true,
+    express:app
+});
+
+//my winston
+winston.info("Initialised nconf");
+winston.info('HTTP Configuration', nconf.get("http"));
+winston.add(winston.transports.file,{"filename":
+"error.log", "level":"error"});
+winston.error("something went wrong");
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'html');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
